@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>食品照片判定測驗</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --primary: #111827;
+      --primary-2: #374151;
+      --good-bg: #ecfdf5;
+      --good-line: #a7f3d0;
+      --good-text: #065f46;
+      --bad-bg: #fef2f2;
+      --bad-line: #fecaca;
+      --bad-text: #991b1b;
+      --warn-bg: #fffbeb;
+      --warn-line: #fde68a;
+      --warn-text: #92400e;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif; background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%); color: var(--text); }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 18px 14px 40px; }
+    .top { display: flex; gap: 10px; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .badge { background: rgba(255,255,255,.9); border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; font-size: 14px; box-shadow: 0 2px 10px rgba(15,23,42,.04); }
+    .progress { width: 100%; height: 12px; background: #e5e7eb; border-radius: 999px; overflow: hidden; margin-bottom: 14px; }
+    .bar { height: 100%; width: 0%; background: linear-gradient(90deg, #111827 0%, #374151 100%); transition: width .25s ease; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 26px; overflow: hidden; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08); }
+    .img-wrap { position: relative; background: #f3f4f6; }
+    .img-wrap img { display: block; width: 100%; height: auto; max-height: 62vh; object-fit: contain; background: #f8fafc; }
+    .tag { position: absolute; left: 12px; top: 12px; background: rgba(255,255,255,.92); border: 1px solid var(--line); border-radius: 999px; padding: 7px 10px; font-size: 12px; font-weight: 700; }
+    .body { padding: 18px; }
+    h1 { font-size: 24px; line-height: 1.35; margin: 0 0 8px; }
+    .sub { color: var(--muted); font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+    .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    button { font: inherit; cursor: pointer; border: none; }
+    .btn { width: 100%; border: 1px solid var(--line); border-radius: 18px; background: white; color: var(--text); padding: 16px 14px; font-weight: 700; line-height: 1.55; transition: .18s ease; }
+    .btn.active { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-1px); box-shadow: 0 8px 18px rgba(17,24,39,.18); }
+    .btn:disabled { opacity: .65; cursor: not-allowed; }
+    .reasons { border: 1px solid var(--warn-line); background: var(--warn-bg); border-radius: 18px; padding: 14px; margin-bottom: 14px; }
+    .reasons-title { color: var(--warn-text); font-weight: 800; margin-bottom: 10px; line-height: 1.6; }
+    .reason { width: 100%; text-align: left; border: 1px solid #fcd34d; background: white; border-radius: 14px; padding: 12px 13px; margin-bottom: 8px; line-height: 1.55; }
+    .reason.active { background: #fef3c7; border-color: #f59e0b; color: #78350f; font-weight: 700; }
+    .submit, .next, .restart { width: 100%; border-radius: 18px; padding: 16px 14px; font-weight: 800; line-height: 1.5; background: var(--primary); color: white; }
+    .submit:disabled { background: #d1d5db; color: #9ca3af; cursor: not-allowed; }
+    .feedback { border-radius: 18px; padding: 14px; margin-bottom: 14px; border: 1px solid var(--line); line-height: 1.7; }
+    .feedback.good { background: var(--good-bg); border-color: var(--good-line); color: var(--good-text); }
+    .feedback.bad { background: var(--bad-bg); border-color: var(--bad-line); color: var(--bad-text); }
+    .feedback strong { display: block; margin-bottom: 6px; font-size: 18px; }
+    .result-card { background: var(--card); border: 1px solid var(--line); border-radius: 28px; box-shadow: 0 10px 30px rgba(15,23,42,.08); padding: 20px; }
+    .score-box { background: linear-gradient(135deg, #111827 0%, #374151 100%); color: white; border-radius: 24px; padding: 22px; margin: 16px 0; }
+    .score-big { font-size: 46px; font-weight: 900; line-height: 1.1; margin: 8px 0; }
+    .muted { color: var(--muted); line-height: 1.7; }
+    .result-hero { margin: 16px 0 18px; border-radius: 24px; padding: 20px 16px; text-align: center; border: 1px solid var(--line); }
+    .result-hero.perfect { background: linear-gradient(180deg, #fff7d6 0%, #ffefad 100%); border-color: #f4d26b; }
+    .result-hero.keep-going { background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%); border-color: #93c5fd; }
+    .hero-icon { width: 92px; height: 92px; margin: 0 auto 12px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-size: 50px; background: rgba(255,255,255,.85); box-shadow: 0 8px 20px rgba(15,23,42,.10); }
+    .hero-title { font-size: 24px; font-weight: 900; line-height: 1.35; margin-bottom: 8px; }
+    .hero-line { font-size: 15px; line-height: 1.7; }
+    .lang { font-size: 14px; line-height: 1.65; margin: 3px 0; }
+    @media (max-width: 520px) { .wrap { padding: 12px 10px 30px; } .body { padding: 14px; } h1 { font-size: 20px; } .btn-grid { grid-template-columns: 1fr; } .score-big { font-size: 38px; } }
+  </style>
+</head>
+<body>
+  <div class="wrap"><div id="app"></div></div>
+  <script>
+    const questions = [{"id":1,"image":"images/q01.jpg","answer":"wrong","title_zh":"第 1 題","title_id":"Soal 1","title_vi":"Câu 1","reasonAnswer":"floor","explanation":{"zh":"正解：錯誤；原因：盛裝食品籃子不可直接放於地上","id":"Jawaban benar: Salah; alasan: Keranjang berisi makanan tidak boleh langsung diletakkan di lantai","vi":"Đáp án đúng: Sai; lý do: Giỏ đựng thực phẩm không được đặt trực tiếp xuống sàn"},"wrongReasonOptions":[{"value":"floor","zh":"盛裝食品籃子不可直接放於地上","id":"Keranjang berisi makanan tidak boleh langsung diletakkan di lantai","vi":"Giỏ đựng thực phẩm không được đặt trực tiếp xuống sàn"},{"value":"blank_1","zh":"","id":"","vi":""},{"value":"blank_2","zh":"","id":"","vi":""},{"value":"blank_3","zh":"","id":"","vi":""}]},{"id":2,"image":"images/q02.jpg","answer":"correct","title_zh":"第 2 題","title_id":"Soal 2","title_vi":"Câu 2","explanation":{"zh":"正解：正確；原因：放於貨架上","id":"Jawaban benar: Benar; alasan: Diletakkan di rak","vi":"Đáp án đúng: Đúng; lý do: Đặt trên kệ"}},{"id":3,"image":"images/q03.jpg","answer":"wrong","title_zh":"第 3 題","title_id":"Soal 3","title_vi":"Câu 3","reasonAnswer":"floor","explanation":{"zh":"正解：錯誤；原因：盛裝食品籃子不可直接放於地上","id":"Jawaban benar: Salah; alasan: Keranjang berisi makanan tidak boleh langsung diletakkan di lantai","vi":"Đáp án đúng: Sai; lý do: Giỏ đựng thực phẩm không được đặt trực tiếp xuống sàn"},"wrongReasonOptions":[{"value":"floor","zh":"盛裝食品籃子不可直接放於地上","id":"Keranjang berisi makanan tidak boleh langsung diletakkan di lantai","vi":"Giỏ đựng thực phẩm không được đặt trực tiếp xuống sàn"},{"value":"blank_1","zh":"","id":"","vi":""},{"value":"blank_2","zh":"","id":"","vi":""},{"value":"blank_3","zh":"","id":"","vi":""}]},{"id":4,"image":"images/q04.jpg","answer":"wrong","title_zh":"第 4 題","title_id":"Soal 4","title_vi":"Câu 4","reasonAnswer":"floor","explanation":{"zh":"正解：錯誤；原因：盛裝食品容器不可直接放於地上","id":"Jawaban benar: Salah; alasan: Wadah berisi makanan tidak boleh langsung diletakkan di lantai","vi":"Đáp án đúng: Sai; lý do: Dụng cụ chứa thực phẩm không được đặt trực tiếp xuống sàn"},"wrongReasonOptions":[{"value":"floor","zh":"盛裝食品容器不可直接放於地上","id":"Wadah berisi makanan tidak boleh langsung diletakkan di lantai","vi":"Dụng cụ chứa thực phẩm không được đặt trực tiếp xuống sàn"},{"value":"blank_1","zh":"","id":"","vi":""},{"value":"blank_2","zh":"","id":"","vi":""},{"value":"blank_3","zh":"","id":"","vi":""}]},{"id":5,"image":"images/q05.jpg","answer":"correct","title_zh":"第 5 題","title_id":"Soal 5","title_vi":"Câu 5","explanation":{"zh":"正解：正確；原因：隔底籃墊高","id":"Jawaban benar: Benar; alasan: Ditinggikan dengan keranjang alas","vi":"Đáp án đúng: Đúng; lý do: Được kê cao bằng rổ lót bên dưới"}},{"id":6,"image":"images/q06.jpg","answer":"wrong","title_zh":"第 6 題","title_id":"Soal 6","title_vi":"Câu 6","reasonAnswer":"floor","explanation":{"zh":"正解：錯誤；原因：盛裝食品容器不可直接放於地上","id":"Jawaban benar: Salah; alasan: Wadah berisi makanan tidak boleh langsung diletakkan di lantai","vi":"Đáp án đúng: Sai; lý do: Dụng cụ chứa thực phẩm không được đặt trực tiếp xuống sàn"},"wrongReasonOptions":[{"value":"floor","zh":"盛裝食品容器不可直接放於地上","id":"Wadah berisi makanan tidak boleh langsung diletakkan di lantai","vi":"Dụng cụ chứa thực phẩm không được đặt trực tiếp xuống sàn"},{"value":"blank_1","zh":"","id":"","vi":""},{"value":"blank_2","zh":"","id":"","vi":""},{"value":"blank_3","zh":"","id":"","vi":""}]},{"id":7,"image":"images/q07.jpg","answer":"wrong","title_zh":"第 7 題","title_id":"Soal 7","title_vi":"Câu 7","reasonAnswer":"floor","explanation":{"zh":"正解：錯誤；原因：盛裝食品容器不可直接放於地上","id":"Jawaban benar: Salah; alasan: Wadah berisi makanan tidak boleh langsung diletakkan di lantai","vi":"Đáp án đúng: Sai; lý do: Dụng cụ chứa thực phẩm không được đặt trực tiếp xuống sàn"},"wrongReasonOptions":[{"value":"floor","zh":"盛裝食品容器不可直接放於地上","id":"Wadah berisi makanan tidak boleh langsung diletakkan di lantai","vi":"Dụng cụ chứa thực phẩm không được đặt trực tiếp xuống sàn"},{"value":"blank_1","zh":"","id":"","vi":""},{"value":"blank_2","zh":"","id":"","vi":""},{"value":"blank_3","zh":"","id":"","vi":""}]},{"id":8,"image":"images/q08.jpg","answer":"correct","title_zh":"第 8 題","title_id":"Soal 8","title_vi":"Câu 8","explanation":{"zh":"正解：正確；原因：放於貨架上","id":"Jawaban benar: Benar; alasan: Diletakkan di rak","vi":"Đáp án đúng: Đúng; lý do: Đặt trên kệ"}},{"id":9,"image":"images/q09.jpg","answer":"wrong","title_zh":"第 9 題","title_id":"Soal 9","title_vi":"Câu 9","reasonAnswer":"floor","explanation":{"zh":"正解：錯誤；原因：盛裝食品籃子不可直接放於地上","id":"Jawaban benar: Salah; alasan: Keranjang berisi makanan tidak boleh langsung diletakkan di lantai","vi":"Đáp án đúng: Sai; lý do: Giỏ đựng thực phẩm không được đặt trực tiếp xuống sàn"},"wrongReasonOptions":[{"value":"floor","zh":"盛裝食品籃子不可直接放於地上","id":"Keranjang berisi makanan tidak boleh langsung diletakkan di lantai","vi":"Giỏ đựng thực phẩm không được đặt trực tiếp xuống sàn"},{"value":"blank_1","zh":"","id":"","vi":""},{"value":"blank_2","zh":"","id":"","vi":""},{"value":"blank_3","zh":"","id":"","vi":""}]},{"id":10,"image":"images/q10.jpg","answer":"wrong","title_zh":"第 10 題","title_id":"Soal 10","title_vi":"Câu 10","reasonAnswer":"floor","explanation":{"zh":"正解：錯誤；原因：盛裝食品容器不可直接放於地上","id":"Jawaban benar: Salah; alasan: Wadah berisi makanan tidak boleh langsung diletakkan di lantai","vi":"Đáp án đúng: Sai; lý do: Dụng cụ chứa thực phẩm không được đặt trực tiếp xuống sàn"},"wrongReasonOptions":[{"value":"floor","zh":"盛裝食品容器不可直接放於地上","id":"Wadah berisi makanan tidak boleh langsung diletakkan di lantai","vi":"Dụng cụ chứa thực phẩm không được đặt trực tiếp xuống sàn"},{"value":"blank_1","zh":"","id":"","vi":""},{"value":"blank_2","zh":"","id":"","vi":""},{"value":"blank_3","zh":"","id":"","vi":""}]},{"id":11,"image":"images/q11.jpg","answer":"correct","title_zh":"第 11 題","title_id":"Soal 11","title_vi":"Câu 11","explanation":{"zh":"正解：正確；原因：隔底籃墊高","id":"Jawaban benar: Benar; alasan: Ditinggikan dengan keranjang alas","vi":"Đáp án đúng: Đúng; lý do: Được kê cao bằng rổ lót bên dưới"}},{"id":12,"image":"images/q12.jpg","answer":"correct","title_zh":"第 12 題","title_id":"Soal 12","title_vi":"Câu 12","explanation":{"zh":"正解：正確；原因：隔推車墊高","id":"Jawaban benar: Benar; alasan: Ditinggikan dengan troli","vi":"Đáp án đúng: Đúng; lý do: Được kê cao bằng xe đẩy bên dưới"}}];
+    const wrongReasonOptions = [{"value":"floor","zh":"不可放置於地上","id":"tidak boleh ditaruh di lantai","vi":"không được để dưới sàn"},{"value":"blank_1","zh":"","id":"","vi":""},{"value":"blank_2","zh":"","id":"","vi":""},{"value":"blank_3","zh":"","id":"","vi":""}];
+    let currentIndex = 0, score = 0, selectedChoice = "", selectedReason = "", submitted = false, lastCorrect = false;
+    const app = document.getElementById("app");
+    function choiceButton(value, zh, id, vi){ return `<button class="btn ${selectedChoice===value?"active":""}" ${submitted?"disabled":""} onclick="chooseChoice('${value}')">${zh}<div class="lang">${id}</div><div class="lang">${vi}</div></button>`; }
+    function reasonButtons(){ const q = questions[currentIndex]; const options = q.wrongReasonOptions || wrongReasonOptions; return options.map(opt=>`<button class="reason ${selectedReason===opt.value?"active":""}" ${submitted?"disabled":""} onclick="chooseReason('${opt.value}')"><div>${opt.zh||"&nbsp;"}</div><div class="lang">${opt.id||"&nbsp;"}</div><div class="lang">${opt.vi||"&nbsp;"}</div></button>`).join(""); }
+    function canSubmit(){ if(!selectedChoice) return false; if(selectedChoice==="wrong") return !!selectedReason; return true; }
+    function submitAnswer(){ if(!canSubmit()) return; const q = questions[currentIndex]; const correct = q.answer === "correct" ? selectedChoice === "correct" : selectedChoice === "wrong" && selectedReason === q.reasonAnswer; if(correct) score += 1; lastCorrect = correct; submitted = true; render(); }
+    function nextQuestion(){ currentIndex += 1; selectedChoice = ""; selectedReason = ""; submitted = false; lastCorrect = false; render(); }
+    function restartQuiz(){ currentIndex = 0; score = 0; selectedChoice = ""; selectedReason = ""; submitted = false; lastCorrect = false; render(); }
+    function renderQuestion(){ const q = questions[currentIndex]; const progress = ((currentIndex + 1) / questions.length) * 100; app.innerHTML = `<div class="top"><div class="badge">${q.title_zh} / ${q.title_id} / ${q.title_vi}</div><div class="badge">第 ${currentIndex + 1} / ${questions.length} 題</div></div><div class="progress"><div class="bar" style="width:${progress}%"></div></div><div class="card"><div class="img-wrap"><img src="${q.image}" alt="Question image" /><div class="tag">看圖判定 / Pilih benar atau salah / Chọn đúng hoặc sai</div></div><div class="body"><h1>請判斷這張照片是否符合規範</h1><div class="sub"><div>印尼文：Silakan tentukan apakah foto ini sesuai ketentuan.</div><div>越南文：Hãy xác định hình này có đúng quy định hay không.</div></div><div class="btn-grid">${choiceButton("correct","正確","Benar","Đúng")}${choiceButton("wrong","錯誤","Salah","Sai")}</div>${selectedChoice === "wrong" ? `<div class="reasons"><div class="reasons-title"><div>請選擇錯誤原因</div><div class="lang">Pilih alasan kesalahan</div><div class="lang">Chọn lý do sai</div></div>${reasonButtons()}</div>` : ""}${!submitted ? `<button class="submit" onclick="submitAnswer()" ${canSubmit() ? "" : "disabled"}>送出答案 / Kirim jawaban / Gửi câu trả lời</button>` : `<div class="feedback ${lastCorrect ? "good" : "bad"}"><strong>${lastCorrect ? "答對了 / Benar / Chính xác" : "答錯了 / Salah / Sai"}</strong><div>${q.explanation.zh}</div><div class="lang">${q.explanation.id}</div><div class="lang">${q.explanation.vi}</div></div><button class="next" onclick="nextQuestion()">${currentIndex === questions.length - 1 ? "查看成績 / Lihat hasil / Xem kết quả" : "下一題 / Soal berikutnya / Câu tiếp theo"}</button>`}</div></div>`; }
+    function renderResult(){ const total = questions.length; const percent = Math.round((score / total) * 100); const perfect = score === total; const heroClass = perfect ? "perfect" : "keep-going"; const heroIcon = perfect ? "🏅" : "💪"; const heroTitleZh = perfect ? "恭喜通關" : "再接再厲"; const heroTitleId = perfect ? "Selamat" : "Semangat"; const heroTitleVi = perfect ? "Chúc mừng" : "Cố lên"; app.innerHTML = `<div class="result-card"><div class="badge">作答完成 / Selesai / Hoàn thành</div><h1 style="margin-top:14px;">總結果 / Hasil akhir / Kết quả cuối</h1><div class="muted"><div>已完成全部 ${total} 題。</div><div>Semua ${total} soal telah selesai.</div><div>Đã hoàn thành tất cả ${total} câu.</div></div><div class="result-hero ${heroClass}"><div class="hero-icon">${heroIcon}</div><div class="hero-title">${heroTitleZh}</div><div class="hero-line">${heroTitleId}</div><div class="hero-line">${heroTitleVi}</div></div><div class="score-box"><div>答對題數 / Jumlah benar / Số câu đúng</div><div class="score-big">${score} / ${total}</div><div>正確率 ${percent}%</div></div><button class="restart" onclick="restartQuiz()">重新作答 / Kerjakan ulang / Làm lại</button></div>`; }
+    function chooseChoice(value){ if(submitted) return; selectedChoice = value; if(value !== "wrong") selectedReason = ""; render(); }
+    function chooseReason(value){ if(submitted) return; selectedReason = value; render(); }
+    window.submitAnswer = submitAnswer; window.nextQuestion = nextQuestion; window.restartQuiz = restartQuiz; window.chooseChoice = chooseChoice; window.chooseReason = chooseReason;
+    function render(){ if(currentIndex >= questions.length){ renderResult(); } else { renderQuestion(); } }
+    render();
+  </script>
+</body>
+</html>
